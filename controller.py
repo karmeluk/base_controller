@@ -1,12 +1,23 @@
 from pymodbus.client.sync import ModbusSerialClient
-
+from PyQt4 import QtGui
+import sys
 
 class RobotHQ:
-    # TODO:
-    # 4 buttons, 2 text fields
-    # GUI (forward/back/right/left, velocity, distanse) -> cmd
+    # TODO: 5 buttons, 2 text fields
+    # GUI (forward/back/right/left/stop, velocity, distance) -> cmd
     def __init__(self):
-        pass
+        self.app = QtGui.QApplication(sys.argv)
+        self.w = QtGui.QWidget()
+        self.w.resize(250, 150)
+        self.w.move(300, 300)
+        self.w.setWindowTitle('HQ mobile robot')
+        print 'CREATED'
+        print self.__class__.__name__
+
+
+    def start_gui(self):
+        self.w.show()
+        sys.exit(self.app.exec_())
 
 
 class ROSBaseControl:

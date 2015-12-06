@@ -5,8 +5,9 @@ from controller import RobotHQ, ROSBaseControl, Controller
 def main():
     test = TestsRobot()
     # run tests here
-    test.test_Controller()
-
+    # test.test_Controller()
+    test.test_RobotHQ()
+    # test.test_ROSBaseControl()
 
 class TestsRobot:
 
@@ -15,12 +16,13 @@ class TestsRobot:
 
     def start_info(self, obj):
         sym = '#'*100
-        print "%\ns\n%s TEST\n%s\n" % (sym, obj.__class__.__name__, sym)
+        print "\n%s\n%s TEST\n%s\n" % (sym, obj.__class__.__name__, sym)
 
     def test_RobotHQ(self):
         test_object = RobotHQ()
         self.start_info(test_object)
         # TODO: implement test for pyQT GUI
+        test_object.start_gui()
 
     def test_ROSBaseControl(self):
         test_object = ROSBaseControl()
