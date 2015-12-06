@@ -4,10 +4,10 @@ from controller import RobotHQ, ROSBaseControl, Controller
 
 def main():
     test = TestsRobot()
-    # run tests here
-    # test.test_Controller()
-    test.test_RobotHQ()
-    # test.test_ROSBaseControl()
+    TESTS = ['test.test_Controller()', 'test.test_RobotHQ()', 'test.test_ROSBaseControl()']
+    print " 1 - Controller()\n 2 - RobotHQ()\n 3 - RosBaseControl()\n"
+    choice = input("Please choose test to run:\n")
+    exec TESTS[choice-1]
 
 class TestsRobot:
 
@@ -21,7 +21,7 @@ class TestsRobot:
     def test_RobotHQ(self):
         test_object = RobotHQ()
         self.start_info(test_object)
-        # TODO: implement test for pyQT GUI
+
         test_object.start_gui()
 
     def test_ROSBaseControl(self):
