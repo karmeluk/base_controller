@@ -46,30 +46,29 @@ class RobotHQ(QtGui.QWidget):
         self.le_vel = QtGui.QLineEdit('1000000', self)
         self.le_vel.move(10, 150)
 
-        lb_dis = QtGui.QLabel('Distance', self)
+        lb_dis = QtGui.QLabel('Position', self)
         lb_dis.move(160, 135)
-        self.le_dis = QtGui.QLineEdit(self)
-        self.le_dis.move(155, 150)
+        self.le_pos = QtGui.QLineEdit(self)
+        self.le_pos.move(155, 150)
 
     def handleButtonFWD(self):
-        vel = self.le_vel.text()
-        self.controller.set_global_velocity(int(vel))
+        self.controller.set_global_velocity(int(self.le_vel.text()))
+        if self.le_pos.text() != '':
+            # TODO: implement self.controller.set_possition(int(self.le_pos.text()))
+            pass
         self.controller.go_forward()
 
 
     def handleButtonBack(self):
-        vel = self.le_vel.text()
-        self.controller.set_global_velocity(int(vel))
+        self.controller.set_global_velocity(int(self.le_vel.text()))
         self.controller.go_back()
 
     def handleButtonR(self):
-        vel = self.le_vel.text()
-        self.controller.set_global_velocity(int(vel))
+        self.controller.set_global_velocity(int(self.le_vel.text()))
         self.controller.turn_right()
 
     def handleButtonL(self):
-        vel = self.le_vel.text()
-        self.controller.set_global_velocity(int(vel))
+        self.controller.set_global_velocity(int(self.le_vel.text()))
         self.controller.turn_left()
 
     def handleButtonSTP(self):
