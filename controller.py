@@ -10,18 +10,17 @@ class RobotHQ(QtGui.QWidget):
         self.controller = Controller()
         self.app = QtGui.QApplication(sys.argv)
         super(RobotHQ, self).__init__()
-
         self.setGeometry(500, 500, 300, 300)
         self.setWindowTitle('Message box')
         self.init_ui()
         self.center()
 
     def init_ui(self):
-
         btn_fwd = QtGui.QPushButton('Move Forward', self)
         btn_fwd.clicked.connect(self.handleButtonFWD)
         btn_fwd.resize(btn_fwd.sizeHint())
         btn_fwd.move(115, 10)
+
         btn_back = QtGui.QPushButton('Back', self)
         btn_back.clicked.connect(self.handleButtonBack)
         btn_back.resize(btn_back.sizeHint())
@@ -30,16 +29,29 @@ class RobotHQ(QtGui.QWidget):
         btn_stop = QtGui.QPushButton('Stop', self)
         btn_stop.clicked.connect(self.handleButtonSTP)
         btn_stop.resize(btn_stop.sizeHint())
-        btn_stop.move(115, 100)
+        btn_stop.move(115, 90)
 
         btn_left = QtGui.QPushButton('Turn Left', self)
         btn_left.clicked.connect(self.handleButtonL)
         btn_left.resize(btn_stop.sizeHint())
         btn_left.move(10, 30)
+
         btn_right = QtGui.QPushButton('Turn Right', self)
         btn_right.clicked.connect(self.handleButtonR)
         btn_right.resize(btn_stop.sizeHint())
         btn_right.move(210, 30)
+
+        lb_vel = QtGui.QLabel('Velocity', self)
+        lb_vel.move(15, 120)
+        le_vel = QtGui.QLineEdit('5000000', self)
+        le_vel.move(10, 135)
+
+        lb_dis = QtGui.QLabel('Distance', self)
+        lb_dis.move(160, 120)
+        le_dis = QtGui.QLineEdit(self)
+        le_dis.move(155, 135)
+
+
 
     def handleButtonFWD(self):
         self.controller.go_forward()
@@ -56,7 +68,6 @@ class RobotHQ(QtGui.QWidget):
 
     def handleButtonSTP(self):
         self.controller.stop_motor()
-
 
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'Message',
