@@ -10,8 +10,8 @@ class RobotHQ(QtGui.QWidget):
         self.controller = Controller()
         self.app = QtGui.QApplication(sys.argv)
         super(RobotHQ, self).__init__()
-        self.setGeometry(500, 500, 300, 300)
-        self.setWindowTitle('Message box')
+        self.setGeometry(500, 500, 300, 200)
+        self.setWindowTitle('Mobile Robot control')
         self.init_ui()
         self.center()
 
@@ -42,28 +42,34 @@ class RobotHQ(QtGui.QWidget):
         btn_right.move(210, 30)
 
         lb_vel = QtGui.QLabel('Velocity', self)
-        lb_vel.move(15, 120)
-        le_vel = QtGui.QLineEdit('5000000', self)
-        le_vel.move(10, 135)
+        lb_vel.move(15, 135)
+        self.le_vel = QtGui.QLineEdit('1000000', self)
+        self.le_vel.move(10, 150)
 
         lb_dis = QtGui.QLabel('Distance', self)
-        lb_dis.move(160, 120)
-        le_dis = QtGui.QLineEdit(self)
-        le_dis.move(155, 135)
-
-
+        lb_dis.move(160, 135)
+        self.le_dis = QtGui.QLineEdit(self)
+        self.le_dis.move(155, 150)
 
     def handleButtonFWD(self):
+        vel = self.le_vel.text()
+        self.controller.set_global_velocity(int(vel))
         self.controller.go_forward()
 
+
     def handleButtonBack(self):
+        vel = self.le_vel.text()
+        self.controller.set_global_velocity(int(vel))
         self.controller.go_back()
 
-
     def handleButtonR(self):
+        vel = self.le_vel.text()
+        self.controller.set_global_velocity(int(vel))
         self.controller.turn_right()
 
     def handleButtonL(self):
+        vel = self.le_vel.text()
+        self.controller.set_global_velocity(int(vel))
         self.controller.turn_left()
 
     def handleButtonSTP(self):
@@ -84,8 +90,6 @@ class RobotHQ(QtGui.QWidget):
         cp = QtGui.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-
-
 
     def start_gui(self):
         self.show()
