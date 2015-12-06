@@ -1,25 +1,4 @@
-import serial
-import time
 from pymodbus.client.sync import ModbusSerialClient
-
-def main():
-    controller = Controller(1)
-    test_case(controller)
-
-def test_case(controller):
-    vel = 5000000
-    controller.set_global_velocity(vel/5)
-    controller.go_forward()
-    time.sleep(2)
-    controller.set_global_velocity(vel/5)
-    controller.go_back()
-    time.sleep(2)
-    controller.set_global_velocity(vel/2)
-    controller.turn_right()
-    time.sleep(5)
-    controller.turn_left()
-    time.sleep(5)
-    controller.stop_motor()
 
 
 class RobotHQ:
@@ -147,7 +126,3 @@ class Controller:
     def get_acceleration(self, motor, speed):
         # TODO
         pass
-
-
-if __name__ == '__main__':
-    main()
