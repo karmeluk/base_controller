@@ -2,6 +2,33 @@ import serial
 import time
 from pymodbus.client.sync import ModbusSerialClient
 
+def main():
+    controller = Controller(1)
+    test_case(controller)
+
+def test_case(controller):
+    vel = 5000000
+    controller.set_global_velocity(vel/5)
+    controller.go_forward()
+    time.sleep(2)
+    controller.set_global_velocity(vel/5)
+    controller.go_back()
+    time.sleep(2)
+    controller.set_global_velocity(vel/2)
+    controller.turn_right()
+    time.sleep(5)
+    controller.turn_left()
+    time.sleep(5)
+    controller.stop_motor()
+
+
+class RobotHQ:
+    # TODO:
+    # 4 buttons, 2 text fields
+    # GUI (forward/back/right/left, velocity, distanse) -> cmd
+    def __init__(self):
+        pass
+
 
 class ROSBaseControl:
 
@@ -10,16 +37,13 @@ class ROSBaseControl:
 
     def convert_twist(self, twist):
         # TODO: converter from vector3 linear & vector3 angular to (direction, speed)
-        # directions: 'forward', 'right', 'left', 'back', 'stop')
+        # Twist(v_linear, v_angular) -> cmd (forward/back/right/left/stop, velocity, distance)
         # speed in m/s!!
-        #
         # forward with V m/s
         # twist.linear.x = V;                   # our forward speed
         # twist.linear.y = 0; twist.linear.z = 0;     # we can't use these!
         # twist.angular.x = 0; twist.angular.y = 0;   #          or these!
         # twist.angular.z = 0;
-        #
-
         cmd = None
         return cmd
 
@@ -41,6 +65,10 @@ class Controller:
         # connect to COM
         self.client = ModbusSerialClient(method='rtu', port=port,\
                                          baudrate=115200, stopbits=1, parity='N', bytesize=8, timeout=0.1)
+
+    def cmd_listener(self):
+        # TODO: cmd input. callback?
+        pass
 
     def read_register(self, address, size=16, unit=1):
         _r = self.client.read_holding_registers(address, size, unit)
@@ -119,26 +147,6 @@ class Controller:
     def get_acceleration(self, motor, speed):
         # TODO
         pass
-
-
-def main():
-    controller = Controller(1)
-    test_case(controller)
-
-def test_case(controller):
-    vel = 5000000
-    controller.set_global_velocity(vel/5)
-    controller.go_forward()
-    time.sleep(2)
-    controller.set_global_velocity(vel/5)
-    controller.go_back()
-    time.sleep(2)
-    controller.set_global_velocity(vel/2)
-    controller.turn_right()
-    time.sleep(5)
-    controller.turn_left()
-    time.sleep(5)
-    controller.stop_motor()
 
 
 if __name__ == '__main__':
