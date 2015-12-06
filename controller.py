@@ -32,7 +32,7 @@ class ROSBaseControl:
 
 class Controller:
 
-    MOTION = {"pos":"AB", "fwd":"BB", "bck":"CB"}
+    MOTION = {"POS":"AB", "FWD":"BB", "BCK":"CB"}
     STOP = {"Hard":0xABFF, "Smooth":0xCDFF, "Other":0xCBFF}
     CMDS = {'FWD': {'LEFT': 0xBB05, 'RIGHT': 0xCB0A}, 'BCK': {'LEFT': 0xCB05, 'RIGHT': 0xBB0A}}
 
@@ -54,7 +54,7 @@ class Controller:
             return _r
         return None
 
-    def start_motor(self,  motor,mode):
+    def start_motor(self, motor, mode):
         print int(mode+motor,16)
         _r = self.write_register(1, int(mode+motor,16))
         print _r
@@ -66,11 +66,6 @@ class Controller:
     def stop_motor(self, mode=STOP['Hard']):
         _r = self.write_register(2,mode)
         print _r
-
-    def robot_setup(self):
-        # TODO: initialization?
-        # 01030000006585E1 01030000006585E1
-        self.ser.write(serial.to_bytes([0x01, 0x03, 0x00, 0x00, 0x00, 0x65, 0x85, 0xE1]))
 
     def go_forward(self, _stop='Hard'):
         self.stop_motor(self.STOP[_stop])
@@ -92,7 +87,6 @@ class Controller:
         self.start_motor_raw(self.CMDS['BCK']['RIGHT'])
         self.start_motor_raw(self.CMDS['FWD']['LEFT'])
 
-
     def set_global_velocity(self, speed):
         for motor in range(1,5):
             self.set_velocity(motor, speed)
@@ -113,7 +107,6 @@ class Controller:
         low = acceleration % 65536
         hi = acceleration / 65536
         motor -= 1
-        # or 36???
         reg_base = 35 + (motor *7)
         _r1 = self.write_register(reg_base+4, hi)
         _r2 = self.write_register(reg_base+5, low)
@@ -134,13 +127,13 @@ def main():
 
 def test_case(controller):
     vel = 5000000
-    controller.set_global_velocity(vel)
+    controller.set_global_velocity(vel/5)
     controller.go_forward()
     time.sleep(2)
-    controller.set_global_velocity(vel)
+    controller.set_global_velocity(vel/5)
     controller.go_back()
     time.sleep(2)
-    controller.set_global_velocity(vel)
+    controller.set_global_velocity(vel/2)
     controller.turn_right()
     time.sleep(5)
     controller.turn_left()
