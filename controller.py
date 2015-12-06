@@ -1,22 +1,83 @@
 from pymodbus.client.sync import ModbusSerialClient
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 import sys
 
-class RobotHQ:
+
+class RobotHQ(QtGui.QWidget):
     # TODO: 5 buttons, 2 text fields
     # GUI (forward/back/right/left/stop, velocity, distance) -> cmd
     def __init__(self):
+        self.controller = Controller()
         self.app = QtGui.QApplication(sys.argv)
-        self.w = QtGui.QWidget()
-        self.w.resize(250, 150)
-        self.w.move(300, 300)
-        self.w.setWindowTitle('HQ mobile robot')
-        print 'CREATED'
-        print self.__class__.__name__
+        super(RobotHQ, self).__init__()
+
+        self.setGeometry(500, 500, 300, 300)
+        self.setWindowTitle('Message box')
+        self.init_ui()
+        self.center()
+
+    def init_ui(self):
+
+        btn_fwd = QtGui.QPushButton('Move Forward', self)
+        btn_fwd.clicked.connect(self.handleButtonFWD)
+        btn_fwd.resize(btn_fwd.sizeHint())
+        btn_fwd.move(115, 10)
+        btn_back = QtGui.QPushButton('Back', self)
+        btn_back.clicked.connect(self.handleButtonBack)
+        btn_back.resize(btn_back.sizeHint())
+        btn_back.move(115, 50)
+
+        btn_stop = QtGui.QPushButton('Stop', self)
+        btn_stop.clicked.connect(self.handleButtonSTP)
+        btn_stop.resize(btn_stop.sizeHint())
+        btn_stop.move(115, 100)
+
+        btn_left = QtGui.QPushButton('Turn Left', self)
+        btn_left.clicked.connect(self.handleButtonL)
+        btn_left.resize(btn_stop.sizeHint())
+        btn_left.move(10, 30)
+        btn_right = QtGui.QPushButton('Turn Right', self)
+        btn_right.clicked.connect(self.handleButtonR)
+        btn_right.resize(btn_stop.sizeHint())
+        btn_right.move(210, 30)
+
+    def handleButtonFWD(self):
+        self.controller.go_forward()
+
+    def handleButtonBack(self):
+        self.controller.go_back()
+
+
+    def handleButtonR(self):
+        self.controller.turn_right()
+
+    def handleButtonL(self):
+        self.controller.turn_left()
+
+    def handleButtonSTP(self):
+        self.controller.stop_motor()
+
+
+    def closeEvent(self, event):
+        reply = QtGui.QMessageBox.question(self, 'Message',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes |
+            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
 
 
     def start_gui(self):
-        self.w.show()
+        self.show()
         sys.exit(self.app.exec_())
 
 
@@ -51,7 +112,7 @@ class Controller:
     CMDS = {'FWD': {'LEFT': 0xBB05, 'RIGHT': 0xCB0A}, 'BCK': {'LEFT': 0xCB05, 'RIGHT': 0xBB0A}}
 
 
-    def __init__(self, port):
+    def __init__(self, port=1):
         # connect to COM
         self.client = ModbusSerialClient(method='rtu', port=port,\
                                          baudrate=115200, stopbits=1, parity='N', bytesize=8, timeout=0.1)
