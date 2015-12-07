@@ -31,23 +31,34 @@ class ROSBaseControl:
         r_vel = twist.angular.z
         r_vel = r_vel*1000000
 
+        # TODO: implement case (l_vel=1, r_vel=-1)
+
         if l_vel > 0:
+            if r_vel > 0:
+                self.controller.set_global_velocity(abs(r_vel))
+                self.controller.turn_right()
+            elif r_vel < 0:
+                self.controller.set_global_velocity(abs(r_vel))
+                self.controller.turn_left()
+            else:
+                self.controller.stop_motor()
             self.controller.set_global_velocity(abs(l_vel))
             self.controller.go_forward()
         elif l_vel < 0:
+            if r_vel > 0:
+                self.controller.set_global_velocity(abs(r_vel))
+                self.controller.turn_right()
+            elif r_vel < 0:
+                self.controller.set_global_velocity(abs(r_vel))
+                self.controller.turn_left()
+            else:
+                self.controller.stop_motor()
             self.controller.set_global_velocity(abs(l_vel))
             self.controller.go_back()
         else:
             self.controller.stop_motor()
 
-        if r_vel > 0:
-            self.controller.set_global_velocity(abs(r_vel))
-            self.controller.turn_right()
-        elif r_vel < 0:
-            self.controller.set_global_velocity(abs(r_vel))
-            self.controller.turn_left()
-        else:
-            self.controller.stop_motor()
+
 
         cmd = None
         return cmd
