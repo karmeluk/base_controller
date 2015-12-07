@@ -1,11 +1,13 @@
 import roslib
 import rospy
 from geometry_msgs.msg import Twist
+from controller import Controller
 
 
 class ROSBaseControl:
 
     def __init__(self):
+        self.controller = Controller('/dev/ttyS0')
         print "%s is created!" % self.__class__.__name__
 
     def convert_twist(self, twist):
@@ -22,6 +24,16 @@ class ROSBaseControl:
 
         print "forward speed: " + str(twist.linear.x)
         print "rad speed: " + str(twist.angular.z)
+
+        l_vel = twist.linear.x
+        r_vel = twist.angular.z
+
+        if l_vel > 0:
+            self.controller.go_forward()
+        elif l_vel < 0:
+            self.controller.go_back()
+        else:
+            self.controller.stop_motor()
 
         cmd = None
         return cmd

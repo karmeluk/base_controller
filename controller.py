@@ -101,8 +101,7 @@ class Controller:
     STOP = {"Hard":0xABFF, "Smooth":0xCDFF, "Other":0xCBFF}
     CMDS = {'FWD': {'LEFT': 0xBB05, 'RIGHT': 0xCB0A}, 'BCK': {'LEFT': 0xCB05, 'RIGHT': 0xBB0A}}
 
-
-    def __init__(self, port=1):
+    def __init__(self, port='/dev/ttyS0'):
         # connect to COM
         self.client = ModbusSerialClient(method='rtu', port=port,\
                                          baudrate=115200, stopbits=1, parity='N', bytesize=8, timeout=0.1)
