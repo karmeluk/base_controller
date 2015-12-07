@@ -31,24 +31,13 @@ class TestsRobot:
         test_object = ROSBaseControl()
         self.start_info(test_object)
         # TODO: implement test for ROSBaseControl
-        twist = self.twist_generator(1)
-        test_object.convert_twist(twist)
-        time.sleep(2)
-        twist = self.twist_generator(-1)
-        test_object.convert_twist(twist)
-        time.sleep(2)
-        twist = self.twist_generator(0)
-        test_object.convert_twist(twist)
+        TEST_MOVES=[(1, 0), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1), (0, 0)]
 
-        twist = self.twist_generator(1, 1)
-        test_object.convert_twist(twist)
-        time.sleep(2)
-        twist = self.twist_generator(1, -1)
-        test_object.convert_twist(twist)
-        time.sleep(2)
-        twist = self.twist_generator(0)
-        test_object.convert_twist(twist)
-
+        for move in TEST_MOVES:
+            l_vel, r_vel = move
+            twist = self.twist_generator(l_vel, r_vel)
+            test_object.convert_twist(twist)
+            time.sleep(2)
 
     def twist_generator(self, x_speed, ang_speed=0):
         twist = Twist()

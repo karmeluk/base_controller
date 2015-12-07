@@ -13,7 +13,7 @@ class ROSBaseControl:
     def convert_twist(self, twist):
         # TODO: converter from vector3 linear & vector3 angular to (direction, speed)
         # Twist(v_linear, v_angular) -> cmd (forward/back/right/left/stop, velocity, distance)
-        # speed in m/s!!
+        # TODO: speed in m/s!!
         # forward with V m/s
         # twist.linear.x = V; forward speed, if pos - go_forward, if 0 - stop, if neg - go_back
         # twist.angular.z = 0; angle, if pos - turn_right, if neg - turn_left
@@ -57,8 +57,6 @@ class ROSBaseControl:
             self.controller.go_back()
         else:
             self.controller.stop_motor()
-
-
 
         cmd = None
         return cmd
