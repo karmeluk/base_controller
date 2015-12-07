@@ -95,30 +95,6 @@ class RobotHQ(QtGui.QWidget):
         sys.exit(self.app.exec_())
 
 
-class ROSBaseControl:
-
-    def __init__(self):
-        pass
-
-    def convert_twist(self, twist):
-        # TODO: converter from vector3 linear & vector3 angular to (direction, speed)
-        # Twist(v_linear, v_angular) -> cmd (forward/back/right/left/stop, velocity, distance)
-        # speed in m/s!!
-        # forward with V m/s
-        # twist.linear.x = V;                   # our forward speed
-        # twist.linear.y = 0; twist.linear.z = 0;     # we can't use these!
-        # twist.angular.x = 0; twist.angular.y = 0;   #          or these!
-        # twist.angular.z = 0;
-        cmd = None
-        return cmd
-
-    def publish_odom(self):
-        # TODO: Odometry publisher
-        # odometry must be REAL, gerenerated from motor moving..
-        # publish on /odom
-        pass
-
-
 class Controller:
 
     MOTION = {"POS":"AB", "FWD":"BB", "BCK":"CB"}
