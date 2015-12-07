@@ -6,8 +6,8 @@ import sys
 class RobotHQ(QtGui.QWidget):
     # TODO: 5 buttons, 2 text fields
     # GUI (forward/back/right/left/stop, velocity, distance) -> cmd
-    def __init__(self):
-        self.controller = Controller()
+    def __init__(self, port=1):
+        self.controller = Controller(port)
         self.app = QtGui.QApplication(sys.argv)
         super(RobotHQ, self).__init__()
         self.setGeometry(500, 500, 300, 200)
