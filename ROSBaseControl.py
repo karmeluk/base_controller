@@ -26,12 +26,26 @@ class ROSBaseControl:
         print "rad speed: " + str(twist.angular.z)
 
         l_vel = twist.linear.x
+        l_vel = l_vel*1000000
+
         r_vel = twist.angular.z
+        r_vel = r_vel*1000000
 
         if l_vel > 0:
+            self.controller.set_global_velocity(abs(l_vel))
             self.controller.go_forward()
         elif l_vel < 0:
+            self.controller.set_global_velocity(abs(l_vel))
             self.controller.go_back()
+        else:
+            self.controller.stop_motor()
+
+        if r_vel > 0:
+            self.controller.set_global_velocity(abs(r_vel))
+            self.controller.turn_right()
+        elif r_vel < 0:
+            self.controller.set_global_velocity(abs(r_vel))
+            self.controller.turn_left()
         else:
             self.controller.stop_motor()
 
