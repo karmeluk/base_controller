@@ -31,7 +31,8 @@ class TestsRobot:
         test_object = ROSBaseControl()
         self.start_info(test_object)
         # TODO: implement test for ROSBaseControl
-        TEST_MOVES=[(0.1, 0.0), (-0.1, 0.0), (0.1, 0.1), (-0.1, 0.1), (0.1, -0.1), (-0.1, -0.1), (0.0, 0.0)]
+        TEST_MOVES=[(0.1, 0.0), (-0.1, 0.0), (0.1, 0.1), (-0.1, 0.1), (0.1, -0.1),
+                    (-0.1, -0.1), (0.0, 0.0), (0.0, 0.1), (0.0, -0.1)]
 
         for move in TEST_MOVES:
             l_vel, r_vel = move

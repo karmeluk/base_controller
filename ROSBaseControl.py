@@ -2,7 +2,7 @@ import roslib
 import rospy
 from geometry_msgs.msg import Twist
 from controller import Controller
-
+import thread
 
 class ROSBaseControl:
 
@@ -34,6 +34,9 @@ class ROSBaseControl:
 
         # TODO: implement case (l_vel=1, r_vel=-1)
 
+        # TODO: fix lags, refactor
+        # TODO: maybe set vel in threads?
+
         if l_vel > 0:
             if r_vel > 0:
                 self.controller.set_global_velocity(abs(r_vel))
@@ -57,6 +60,14 @@ class ROSBaseControl:
             self.controller.set_global_velocity(abs(l_vel))
             self.controller.go_back()
         else:
+            if r_vel > 0:
+                self.controller.set_global_velocity(abs(r_vel))
+                self.controller.turn_right()
+            elif r_vel < 0:
+                self.controller.set_global_velocity(abs(r_vel))
+                self.controller.turn_left()
+            else:
+                self.controller.stop_motor()
             self.controller.stop_motor()
 
         cmd = None
