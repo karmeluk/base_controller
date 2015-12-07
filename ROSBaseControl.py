@@ -25,11 +25,12 @@ class ROSBaseControl:
         print "forward speed: " + str(twist.linear.x)
         print "rad speed: " + str(twist.angular.z)
 
+        coef = 20000000
         l_vel = twist.linear.x
-        l_vel = l_vel*1000000
+        l_vel = l_vel*coef
 
         r_vel = twist.angular.z
-        r_vel = r_vel*1000000
+        r_vel = r_vel*coef
 
         # TODO: implement case (l_vel=1, r_vel=-1)
 
