@@ -35,6 +35,7 @@ class ROSBaseControl:
         # TODO: implement case (l_vel=1, r_vel=-1)
 
         # TODO: fix lags, refactor
+        # TODO: maybe set vel in threads?
 
         if l_vel > 0:
             if r_vel > 0:
