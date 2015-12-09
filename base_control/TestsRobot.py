@@ -1,5 +1,6 @@
 import time
-from controller import RobotHQ, Controller
+from controller import Controller
+from RobotHQ import RobotHQ
 from ROSBaseControl import ROSBaseControl
 from geometry_msgs.msg import Twist
 
