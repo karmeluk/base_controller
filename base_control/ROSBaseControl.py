@@ -56,6 +56,7 @@ class ROSBaseControl(Thread):
         # publish on /odom
         pass
 
+
 class OdometryPublisher(Thread):
 
     def __init__(self):
@@ -79,4 +80,7 @@ class OdometryPublisher(Thread):
         self.odomPub = rospy.Publisher('odom', Odometry)
         self.odomBroadcaster = TransformBroadcaster()
 
-        rospy.loginfo("Started Odometry simmulator " + name )
+        rospy.loginfo("Started Odometry simmulator " + name)
+
+    def publish_odom(self, vel):
+        pass
