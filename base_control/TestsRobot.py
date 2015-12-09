@@ -4,6 +4,7 @@ from RobotHQ import RobotHQ
 from ROSBaseControl import ROSBaseControl
 from geometry_msgs.msg import Twist
 
+
 def main():
     test = TestsRobot()
     TESTS = ['test.test_Controller()', 'test.test_RobotHQ()', 'test.test_ROSBaseControl()']
