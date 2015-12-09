@@ -1,13 +1,15 @@
 from pymodbus.client.sync import ModbusSerialClient
+from threading import Thread, Event
 
 
-class Controller:
+class Controller(Thread):
 
-    MOTION = {"POS":"AB", "FWD":"BB", "BCK":"CB"}
-    STOP = {"Hard":0xABFF, "Smooth":0xCDFF, "Other":0xCBFF}
+    MOTION = {"POS": "AB", "FWD": "BB", "BCK": "CB"}
+    STOP = {"Hard": 0xABFF, "Smooth": 0xCDFF, "Other": 0xCBFF}
     CMDS = {'FWD': {'LEFT': 0xBB05, 'RIGHT': 0xCB0A}, 'BCK': {'LEFT': 0xCB05, 'RIGHT': 0xBB0A}}
 
     def __init__(self, port='/dev/ttyS0'):
+        Thread.__init__(self)
         # connect to COM
         self.client = ModbusSerialClient(method='rtu', port=port,\
                                          baudrate=115200, stopbits=1, parity='N', bytesize=8, timeout=0.1)
@@ -38,7 +40,7 @@ class Controller:
         print _r
 
     def stop_motor(self, mode=STOP['Hard']):
-        _r = self.write_register(2,mode)
+        _r = self.write_register(2, mode)
         print _r
 
     def go_forward(self, _stop='Hard'):

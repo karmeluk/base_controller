@@ -14,6 +14,7 @@ from tf.broadcaster import TransformBroadcaster
 class ROSBaseControl(Thread):
 
     def __init__(self):
+        Thread.__init__(self)
         self.controller = Controller('/dev/ttyS0')
         print "%s is created!" % self.__class__.__name__
 
@@ -50,18 +51,13 @@ class ROSBaseControl(Thread):
             return ('S', )
 
 
-    def publish_odom(self):
-        # TODO: Odometry publisher
-        # odometry must be REAL, gerenerated from motor moving..
-        # publish on /odom
-        pass
-
-
 class OdometryPublisher(Thread):
 
     def __init__(self):
         Thread.__init__(self)
         self.finished = Event()
+
+        self.base_control = ROSBaseControl()
 
         # Parameters
         self.rate = float(rospy.get_param("~base_controller_rate", 10))
@@ -82,5 +78,9 @@ class OdometryPublisher(Thread):
 
         rospy.loginfo("Started Odometry simmulator " + name)
 
-    def publish_odom(self, vel):
+    def publish_odom(self):
+
+        # TODO: Odometry publisher
+        # odometry must be REAL, generated from motor moving..
+        # publish on /odom
         pass
