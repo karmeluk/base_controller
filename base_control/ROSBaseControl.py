@@ -13,9 +13,12 @@ from tf.broadcaster import TransformBroadcaster
 
 class ROSBaseControl(Thread):
 
+    # TODO: 3 threads: 1 - listen on /cmd_vel, 2 - send to controller, 3 - publish on /odom
+
     def __init__(self):
         Thread.__init__(self)
         self.controller = Controller('/dev/ttyS0')
+        self.odom = OdometryPublisher()
         print "%s is created!" % self.__class__.__name__
 
     def convert_twist(self, twist):
@@ -35,6 +38,12 @@ class ROSBaseControl(Thread):
 
     def send_to_controller(self, cmd):
         pass
+
+    def publish_odometry(self):
+        # TODO: get velocity info from motor
+        # TODO: publish odometry on ROS
+        twist = None
+        self.odom.run(twist)
 
     def parse_linear(self, l_vel):
         if l_vel != 0:
@@ -78,7 +87,7 @@ class OdometryPublisher(Thread):
 
         rospy.loginfo("Started Odometry simmulator " + name)
 
-    def publish_odom(self, twist):
+    def run(self, twist):
 
         # TODO: Odometry publisher
         # TODO: odometry must be REAL, generated from motor moving.
