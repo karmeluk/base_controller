@@ -152,3 +152,10 @@ class OdometryPublisher(Thread):
         print "Shutting down base odom_sim"
         self.finished.set()
         self.join()
+
+# if __name__ == "__main__":
+#
+#     rospy.init_node("odom_sim")
+#     controller = base_controller("spacedrill")
+#     controller.run()
+#     rospy.spin()
