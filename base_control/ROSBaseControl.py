@@ -78,9 +78,68 @@ class OdometryPublisher(Thread):
 
         rospy.loginfo("Started Odometry simmulator " + name)
 
-    def publish_odom(self):
+    def publish_odom(self, twist):
 
         # TODO: Odometry publisher
-        # odometry must be REAL, generated from motor moving..
+        # TODO: odometry must be REAL, generated from motor moving.
         # publish on /odom
-        pass
+
+        rosRate = rospy.Rate(self.rate)
+        rospy.loginfo("Publishing Odometry data at: " + str(self.rate) + " Hz")
+
+        vx = twist.linear.x
+        vy = twist.linear.y
+        vth = twist.angular.z
+
+        while not rospy.is_shutdown() and not self.finished.isSet():
+            now = rospy.Time.now()
+            if now > self.t_next:
+                dt = now - self.then
+                self.then = now
+                dt = dt.to_sec()
+
+                delta_x = (vx * cos(self.th) - vy * sin(self.th)) * dt
+                delta_y = (vx * sin(self.th) + vy * cos(self.th)) * dt
+                delta_th = vth * dt
+
+                self.x += delta_x
+                self.y += delta_y
+                self.th += delta_th
+
+                quaternion = Quaternion()
+                quaternion.x = 0.0
+                quaternion.y = 0.0
+                quaternion.z = sin(self.th / 2.0)
+                quaternion.w = cos(self.th / 2.0)
+
+                # Create the odometry transform frame broadcaster.
+                self.odomBroadcaster.sendTransform(
+                    (self.x, self.y, 0),
+                    (quaternion.x, quaternion.y, quaternion.z, quaternion.w),
+                    rospy.Time.now(),
+                    "base_link",
+                    "odom"
+                )
+
+                odom = Odometry()
+                odom.header.frame_id = "odom"
+                odom.child_frame_id = "base_link"
+                odom.header.stamp = now
+                odom.pose.pose.position.x = self.x
+                odom.pose.pose.position.y = self.y
+                odom.pose.pose.position.z = 0
+                odom.pose.pose.orientation = quaternion
+                odom.twist.twist.linear.x = vx
+                odom.twist.twist.linear.y = 0
+                odom.twist.twist.angular.z = vth
+
+                self.odomPub.publish(odom)
+
+                self.t_next = now + self.t_delta
+
+            rosRate.sleep()
+
+    def stop(self):
+        print "Shutting down base odom_sim"
+        self.finished.set()
+        self.join()
