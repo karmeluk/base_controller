@@ -1,0 +1,9 @@
+<launch>
+  <node pkg="urg_node" type="urg_node" name="urg_node" output="screen">
+    <param name="_ip_address" value="192.168.0.10" />
+  </node>
+
+  <node pkg="robot_karmeluk" type="tf_laser-frame.py" name="tf" output="screen">
+  </node>
+
+</launch>
