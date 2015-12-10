@@ -3,6 +3,7 @@ import rospy
 from geometry_msgs.msg import Twist
 from controller import Controller
 from threading import Thread, Event
+import thread
 from math import sin, cos, pi
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Twist
@@ -15,11 +16,29 @@ class ROSBaseControl(Thread):
 
     # TODO: 3 threads: 1 - listen on /cmd_vel, 2 - send to controller, 3 - publish on /odom
 
-    def __init__(self):
+    def __init__(self, name):
         Thread.__init__(self)
         self.controller = Controller('/dev/ttyS0')
-        self.odom = OdometryPublisher()
-        print "%s is created!" % self.__class__.__name__
+        self.finished = Event()
+
+        # Parameters
+        self.rate = float(rospy.get_param("~base_controller_rate", 10))
+        now = rospy.Time.now()
+
+        self.t_delta = rospy.Duration(1.0/self.rate)
+        self.t_next = now + self.t_delta
+        self.then = now     # time for determining dx/dy
+
+        # internal data odometry
+        self.x = 0          # position in xy plane
+        self.y = 0
+        self.th = 0         # rotation in radians
+
+        # Set up the odometry broadcaster
+        self.odomPub = rospy.Publisher('odom', Odometry)
+        self.odomBroadcaster = TransformBroadcaster()
+
+        rospy.loginfo("Started base_control for" + name)
 
     def convert_twist(self, twist):
         # TODO: converter from vector3 linear & vector3 angular to (direction, speed)
@@ -39,11 +58,6 @@ class ROSBaseControl(Thread):
     def send_to_controller(self, cmd):
         pass
 
-    def publish_odometry(self):
-        # TODO: get velocity info from motor
-        # TODO: publish odometry on ROS
-        twist = None
-        self.odom.run(twist)
 
     def parse_linear(self, l_vel):
         if l_vel != 0:
@@ -59,35 +73,7 @@ class ROSBaseControl(Thread):
         else:
             return ('S', )
 
-
-class OdometryPublisher(Thread):
-
-    def __init__(self):
-        Thread.__init__(self)
-        self.finished = Event()
-
-        self.base_control = ROSBaseControl()
-
-        # Parameters
-        self.rate = float(rospy.get_param("~base_controller_rate", 10))
-        now = rospy.Time.now()
-
-        self.t_delta = rospy.Duration(1.0/self.rate)
-        self.t_next = now + self.t_delta
-        self.then = now     # time for determining dx/dy
-
-        # internal data
-        self.x = 0          # position in xy plane
-        self.y = 0
-        self.th = 0         # rotation in radians
-
-        # Set up the odometry broadcaster
-        self.odomPub = rospy.Publisher('odom', Odometry)
-        self.odomBroadcaster = TransformBroadcaster()
-
-        rospy.loginfo("Started Odometry simmulator " + name)
-
-    def run(self, twist):
+    def publish_odom(self):
 
         # TODO: Odometry publisher
         # TODO: odometry must be REAL, generated from motor moving.
@@ -148,14 +134,18 @@ class OdometryPublisher(Thread):
 
             rosRate.sleep()
 
+    def run(self):
+        # TODO: 3 threads: 1 - listen on /cmd_vel, 2 - send to controller, 3 - publish on /odom
+        # try:
+        #     thread.start_new_thread()
     def stop(self):
         print "Shutting down base odom_sim"
         self.finished.set()
         self.join()
 
-# if __name__ == "__main__":
-#
-#     rospy.init_node("odom_sim")
-#     controller = base_controller("spacedrill")
-#     controller.run()
-#     rospy.spin()
+if __name__ == "__main__":
+
+    rospy.init_node("base_control")
+    base_cont = ROSBaseControl("spacedrill")
+    base_cont.run()
+    rospy.spin()
