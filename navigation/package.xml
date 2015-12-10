@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>robot_karmeluk</name>
+  <name>krim_nav</name>
   <version>0.0.0</version>
-  <description>The robot_karmeluk package</description>
+  <description>The krim_nav package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
