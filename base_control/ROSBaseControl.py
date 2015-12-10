@@ -138,6 +138,8 @@ class ROSBaseControl(Thread):
         # TODO: 3 threads: 1 - listen on /cmd_vel, 2 - send to controller, 3 - publish on /odom
         # try:
         #     thread.start_new_thread()
+        pass
+
     def stop(self):
         print "Shutting down base odom_sim"
         self.finished.set()

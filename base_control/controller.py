@@ -31,8 +31,8 @@ class Controller(Thread):
         return None
 
     def start_motor(self, motor, mode):
-        print int(mode+motor,16)
-        _r = self.write_register(1, int(mode+motor,16))
+        print int(mode+motor, 16)
+        _r = self.write_register(1, int(mode+motor, 16))
         print _r
 
     def start_motor_raw(self, value):
@@ -64,8 +64,16 @@ class Controller(Thread):
         self.start_motor_raw(self.CMDS['FWD']['LEFT'])
 
     def set_global_velocity(self, speed):
-        for motor in range(1,5):
+        for motor in range(1, 5):
             self.set_velocity(motor, speed)
+
+    def set_rwheel_velocity(self, speed):
+        self.set_velocity(1, speed)
+        self.set_velocity(3, speed)
+
+    def set_lwheel_velocity(self, speed):
+        self.set_velocity(2, speed)
+        self.set_velocity(4, speed)
 
     def set_velocity(self, motor, speed):
         # TODO: speed in m/s
@@ -73,7 +81,7 @@ class Controller(Thread):
         low = velocity % 65536
         hi = velocity / 65536
         motor -= 1
-        reg_base = 35 + (motor *7)
+        reg_base = 35 + (motor*7)
         _r1 = self.write_register(reg_base+2, hi)
         _r2 = self.write_register(reg_base+3, low)
         print _r1, _r2
@@ -83,7 +91,7 @@ class Controller(Thread):
         low = acceleration % 65536
         hi = acceleration / 65536
         motor -= 1
-        reg_base = 35 + (motor *7)
+        reg_base = 35 + (motor*7)
         _r1 = self.write_register(reg_base+4, hi)
         _r2 = self.write_register(reg_base+5, low)
         print _r1, _r2
