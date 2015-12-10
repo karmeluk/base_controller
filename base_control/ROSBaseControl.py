@@ -1,153 +1,44 @@
 import roslib
 import rospy
-from geometry_msgs.msg import Twist
 from controller import Controller
-from threading import Thread, Event
-import thread
-from math import sin, cos, pi
-from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Twist
-from geometry_msgs.msg import Pose
-from nav_msgs.msg import Odometry
-from tf.broadcaster import TransformBroadcaster
 
 
-class ROSBaseControl(Thread):
+class ROSBaseControl:
 
-    # TODO: 3 threads: 1 - listen on /cmd_vel, 2 - send to controller, 3 - publish on /odom
-
-    def __init__(self, name):
-        Thread.__init__(self)
+    def __init__(self):
         self.controller = Controller('/dev/ttyS0')
-        self.finished = Event()
 
-        # Parameters
-        self.rate = float(rospy.get_param("~base_controller_rate", 10))
-        now = rospy.Time.now()
+        rospy.loginfo("Started base_control")
+        print "Started base_control2"
 
-        self.t_delta = rospy.Duration(1.0/self.rate)
-        self.t_next = now + self.t_delta
-        self.then = now     # time for determining dx/dy
+    def callback(self, msg):
+        # TODO: from linear & radial velocities to linear vel on right/left wheel
 
-        # internal data odometry
-        self.x = 0          # position in xy plane
-        self.y = 0
-        self.th = 0         # rotation in radians
+        rospy.loginfo("Received a /cmd_vel message!")
+        print "Received a /cmd_vel message2!"
 
-        # Set up the odometry broadcaster
-        self.odomPub = rospy.Publisher('odom', Odometry)
-        self.odomBroadcaster = TransformBroadcaster()
-
-        rospy.loginfo("Started base_control for" + name)
-
-    def convert_twist(self, twist):
-        # TODO: converter from vector3 linear & vector3 angular to (direction, speed)
-        # Twist(v_linear, v_angular) -> cmd (forward/back/right/left/stop, velocity, distance)
-
-        cmd = {}
         # from m/s to controller velocity
         coef = 58823530
-        l_vel = twist.linear.x*coef
-        r_vel = twist.angular.z*coef
+        # L = distance between wheels
+        L = 0.495
 
-        cmd['rad'] = self.parse_radial(r_vel)
-        cmd['x'] = self.parse_linear(l_vel)
-
-        return cmd
-
-    def send_to_controller(self, cmd):
-        pass
-
-
-    def parse_linear(self, l_vel):
-        if l_vel != 0:
-            return ('F', abs(l_vel))
+        if msg.linear.x == 0 and msg.angular.z == 0:
+            self.controller.stop_motor()
         else:
-            return ('S', )
+            rwheel_vel = (2*msg.linear.x - L*msg.angular.z)/2
+            lwheel_vel = (2*msg.linear.x + L*msg.angular.z)/2
+            print rwheel_vel, lwheel_vel
+            self.controller.set_lwheel_velocity(lwheel_vel*coef)
+            self.controller.set_rwheel_velocity(rwheel_vel*coef)
+            self.controller.go_forward()
 
-    def parse_radial(self, r_vel):
-        if r_vel > 0:
-            return ('R', abs(r_vel))
-        elif r_vel < 0:
-            return ('L', abs(r_vel))
-        else:
-            return ('S', )
+    def listener(self):
+        rospy.init_node('base_control')
+        rospy.Subscriber('/cmd_vel', Twist, self.callback)
 
-    def publish_odom(self):
-
-        # TODO: Odometry publisher
-        # TODO: odometry must be REAL, generated from motor moving.
-        # publish on /odom
-
-        rosRate = rospy.Rate(self.rate)
-        rospy.loginfo("Publishing Odometry data at: " + str(self.rate) + " Hz")
-
-        vx = twist.linear.x
-        vy = twist.linear.y
-        vth = twist.angular.z
-
-        while not rospy.is_shutdown() and not self.finished.isSet():
-            now = rospy.Time.now()
-            if now > self.t_next:
-                dt = now - self.then
-                self.then = now
-                dt = dt.to_sec()
-
-                delta_x = (vx * cos(self.th) - vy * sin(self.th)) * dt
-                delta_y = (vx * sin(self.th) + vy * cos(self.th)) * dt
-                delta_th = vth * dt
-
-                self.x += delta_x
-                self.y += delta_y
-                self.th += delta_th
-
-                quaternion = Quaternion()
-                quaternion.x = 0.0
-                quaternion.y = 0.0
-                quaternion.z = sin(self.th / 2.0)
-                quaternion.w = cos(self.th / 2.0)
-
-                # Create the odometry transform frame broadcaster.
-                self.odomBroadcaster.sendTransform(
-                    (self.x, self.y, 0),
-                    (quaternion.x, quaternion.y, quaternion.z, quaternion.w),
-                    rospy.Time.now(),
-                    "base_link",
-                    "odom"
-                )
-
-                odom = Odometry()
-                odom.header.frame_id = "odom"
-                odom.child_frame_id = "base_link"
-                odom.header.stamp = now
-                odom.pose.pose.position.x = self.x
-                odom.pose.pose.position.y = self.y
-                odom.pose.pose.position.z = 0
-                odom.pose.pose.orientation = quaternion
-                odom.twist.twist.linear.x = vx
-                odom.twist.twist.linear.y = 0
-                odom.twist.twist.angular.z = vth
-
-                self.odomPub.publish(odom)
-
-                self.t_next = now + self.t_delta
-
-            rosRate.sleep()
-
-    def run(self):
-        # TODO: 3 threads: 1 - listen on /cmd_vel, 2 - send to controller, 3 - publish on /odom
-        # try:
-        #     thread.start_new_thread()
-        pass
-
-    def stop(self):
-        print "Shutting down base odom_sim"
-        self.finished.set()
-        self.join()
 
 if __name__ == "__main__":
-
-    rospy.init_node("base_control")
-    base_cont = ROSBaseControl("spacedrill")
-    base_cont.run()
+    base = ROSBaseControl()
+    base.listener()
     rospy.spin()
