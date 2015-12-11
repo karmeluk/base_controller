@@ -1,13 +1,17 @@
 from controller import Controller
 from PyQt4 import QtGui, QtCore
+from threading import Thread
+import json
 import sys
+import zmq
 
 
 class RobotHQ(QtGui.QWidget):
     # TODO: 5 buttons, 2 text fields
     # GUI (forward/back/right/left/stop, velocity, distance) -> cmd
-    def __init__(self, port=1):
+    def __init__(self, port=1, server=None):
         self.controller = Controller(port)
+        self.server = server
         self.coef = 58823530
         self.app = QtGui.QApplication(sys.argv)
         super(RobotHQ, self).__init__()
@@ -15,6 +19,14 @@ class RobotHQ(QtGui.QWidget):
         self.setWindowTitle('Mobile Robot control')
         self.init_ui()
         self.center()
+        if server:
+            self.zmq_port = "50060"
+            self.context = zmq.Context()
+            print "Connecting to server..."
+            self.socket = self.context.socket(zmq.REQ)
+            self.socket.connect("tcp://%s:%s" % (self.server, self.zmq_port))
+
+
 
     def init_ui(self):
         btn_fwd = QtGui.QPushButton('Move Forward', self)
@@ -63,27 +75,76 @@ class RobotHQ(QtGui.QWidget):
         return float(real) * self.coef
 
     def handleButtonFWD(self):
-
-        self.controller.set_global_velocity(self.from_real_to_drive_vel(self.le_vel.text()))
-        if self.le_pos.text() != '':
-            # TODO: implement self.controller.set_possition(int(self.le_pos.text()))
-            pass
-        self.controller.go_forward()
+        if self.server:
+            cmd = []
+            cmd.append('forward')
+            cmd.append(str(self.le_vel.text()))
+            v_send = json.dumps(cmd)
+            self.socket.send(v_send)
+            #  Get the reply.
+            message = self.socket.recv()
+            print message
+        else:
+            self.controller.set_global_velocity(self.from_real_to_drive_vel(self.le_vel.text()))
+            if self.le_pos.text() != '':
+                # TODO: implement self.controller.set_possition(int(self.le_pos.text()))
+                pass
+            self.controller.go_forward()
 
     def handleButtonBack(self):
-        self.controller.set_global_velocity(self.from_real_to_drive_vel(self.le_vel.text()))
-        self.controller.go_back()
+        if self.server:
+            cmd = []
+            cmd.append('back')
+            cmd.append(str(self.le_vel.text()))
+            v_send = json.dumps(cmd)
+            self.socket.send(v_send)
+            #  Get the reply.
+            message = self.socket.recv()
+            print message
+        else:
+            self.controller.set_global_velocity(self.from_real_to_drive_vel(self.le_vel.text()))
+            self.controller.go_back()
 
     def handleButtonR(self):
-        self.controller.set_global_velocity(self.from_real_to_drive_vel(self.le_vel.text()))
-        self.controller.turn_right()
+        if self.server:
+            cmd = []
+            cmd.append('right')
+            cmd.append(str(self.le_vel.text()))
+            v_send = json.dumps(cmd)
+            self.socket.send(v_send)
+            #  Get the reply.
+            message = self.socket.recv()
+            print message
+        else:
+            self.controller.set_global_velocity(self.from_real_to_drive_vel(self.le_vel.text()))
+            self.controller.turn_right()
 
     def handleButtonL(self):
-        self.controller.set_global_velocity(self.from_real_to_drive_vel(self.le_vel.text()))
-        self.controller.turn_left()
+        if self.server:
+            cmd = []
+            cmd.append('left')
+            cmd.append(str(self.le_vel.text()))
+            v_send = json.dumps(cmd)
+            self.socket.send(v_send)
+            #  Get the reply.
+            message = self.socket.recv()
+            print message
+        else:
+            self.controller.set_global_velocity(self.from_real_to_drive_vel(self.le_vel.text()))
+            self.controller.turn_left()
 
     def handleButtonSTP(self):
-        self.controller.stop_motor()
+        if self.server:
+            cmd = []
+            cmd.append('stop')
+            cmd.append(str(self.le_vel.text()))
+            v_send = json.dumps(cmd)
+            self.socket.send(v_send)
+            #  Get the reply.
+            message = self.socket.recv()
+            print message
+        else:
+            self.controller.stop_motor()
 
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'Message',
@@ -105,6 +166,7 @@ class RobotHQ(QtGui.QWidget):
         self.show()
         sys.exit(self.app.exec_())
 
+
 if __name__ == '__main__':
-    test_object = RobotHQ('/dev/ttyS0')
+    test_object = RobotHQ('/dev/ttyS0', "localhost")
     test_object.start_gui()

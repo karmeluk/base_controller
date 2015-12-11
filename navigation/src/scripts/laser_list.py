@@ -12,7 +12,7 @@ import zmq
 import sensor_msgs.point_cloud2 as pc2
 
 # zmq_publisher settings
-zmq_port = "17777"
+zmq_port = "50601"
 zmq_context = zmq.Context()
 print "Publishing..."
 zmq_socket = zmq_context.socket(zmq.PUB)
@@ -40,8 +40,14 @@ def callback(scan):
         elem[:] = [format(x, '.5f') for x in elem]
     del mapa[::2]
     del mapa[::2]
+    del mapa[::2]
+
     mapa_string = json.dumps(mapa)
-    zmq_socket.send(mapa_string)
+    #print "%s, %s" % ("mapa:", mapa_string)
+    zmq_socket.send("%s, %s" % ("mapa:", mapa_string))
+
+    #print mapa_string
+
 
 
 def listener():
